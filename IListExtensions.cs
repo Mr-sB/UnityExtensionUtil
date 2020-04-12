@@ -26,7 +26,15 @@ namespace GameUtil.Extensions
 
         public static void Sort<T>(this IList<T> list, int startIndex, int endIndex, Comparison<T> comparison)
         {
-            if (list == null || comparison == null || startIndex < 0 || endIndex >= list.Count || endIndex <= startIndex) return;
+            if (list == null || comparison == null || startIndex < 0 || endIndex >= list.Count || startIndex >= endIndex) return;
+            list.SortInternal(startIndex, endIndex, comparison);
+        }
+        
+        private static void SortInternal<T>(this IList<T> list, int startIndex, int endIndex, Comparison<T> comparison)
+        {
+            //无需错误检查，因为在调用SortInternal之前已经经过检查了，避免递归时重复检查消耗性能
+            //结束条件
+            if(startIndex >= endIndex) return;
             int leftIndex = startIndex;
             int rightIndex = endIndex;
             //取最左边的为基准数
@@ -51,9 +59,9 @@ namespace GameUtil.Extensions
             list[startIndex] = list[leftIndex];
             list[leftIndex] = tmp;
             //递归左
-            list.Sort(startIndex, leftIndex - 1, comparison);
+            list.SortInternal(startIndex, leftIndex - 1, comparison);
             //递归右
-            list.Sort(leftIndex + 1, endIndex, comparison);
+            list.SortInternal(leftIndex + 1, endIndex, comparison);
         }
         #endregion
 
@@ -198,6 +206,14 @@ namespace GameUtil.Extensions
                 output.Add(data);
             }
             return output;
+        }
+        
+        public static IEnumerable<T> FindAllNonAlloc<T>(this IList<T> list, Predicate<T> match)
+        {
+            if (list == null || list.Count <= 0 || match == null) yield break;
+            foreach (var data in list)
+                if (match(data))
+                    yield return data;
         }
         #endregion
         
