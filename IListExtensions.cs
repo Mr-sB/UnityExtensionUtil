@@ -32,39 +32,43 @@ namespace GameUtil.Extensions
             list.SortInternal(startIndex, endIndex, comparison);
             return list;
         }
-        
+
         private static void SortInternal<T>(this IList<T> list, int startIndex, int endIndex, Comparison<T> comparison)
         {
             //无需错误检查，因为在调用SortInternal之前已经经过检查了，避免递归时重复检查消耗性能
-            //结束条件
-            if(startIndex >= endIndex) return;
-            int leftIndex = startIndex;
-            int rightIndex = endIndex;
-            //取最左边的为基准数
-            T tmp = list[startIndex];
-            while (leftIndex < rightIndex)
+            while (true)
             {
-                //先从右开始遍历比较
-                while (comparison(list[rightIndex], tmp) >= 0 && leftIndex < rightIndex)
-                    rightIndex--;
-                //再从左开始遍历比较
-                while (comparison(list[leftIndex], tmp) <= 0 && leftIndex < rightIndex)
-                    leftIndex++;
-                //交换
-                if (leftIndex < rightIndex)
+                //结束条件
+                if (startIndex >= endIndex) return;
+                int leftIndex = startIndex;
+                int rightIndex = endIndex;
+                //取最左边的为基准数
+                T tmp = list[startIndex];
+                while (leftIndex < rightIndex)
                 {
-                    var t = list[leftIndex];
-                    list[leftIndex] = list[rightIndex];
-                    list[rightIndex] = t;
+                    //先从右开始遍历比较
+                    while (comparison(list[rightIndex], tmp) >= 0 && leftIndex < rightIndex) rightIndex--;
+                    //再从左开始遍历比较
+                    while (comparison(list[leftIndex], tmp) <= 0 && leftIndex < rightIndex) leftIndex++;
+                    //交换
+                    if (leftIndex < rightIndex)
+                    {
+                        var t = list[leftIndex];
+                        list[leftIndex] = list[rightIndex];
+                        list[rightIndex] = t;
+                    }
                 }
+
+                //基准数归位
+                list[startIndex] = list[leftIndex];
+                list[leftIndex] = tmp;
+                //递归左
+                list.SortInternal(startIndex, leftIndex - 1, comparison);
+                //递归右
+                // list.SortInternal(leftIndex + 1, endIndex, comparison);
+                // 手动将尾递归优化掉
+                startIndex = leftIndex + 1;
             }
-            //基准数归位
-            list[startIndex] = list[leftIndex];
-            list[leftIndex] = tmp;
-            //递归左
-            list.SortInternal(startIndex, leftIndex - 1, comparison);
-            //递归右
-            list.SortInternal(leftIndex + 1, endIndex, comparison);
         }
         #endregion
 
