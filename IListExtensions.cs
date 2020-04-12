@@ -6,28 +6,32 @@ namespace GameUtil.Extensions
     public static class IListExtensions
     {
         #region Sort
-        public static void Sort<T>(this T[] array, IComparer<T> comparer)
+        public static T[] Sort<T>(this T[] array, IComparer<T> comparer)
         {
-            if (array == null || array.Length <= 1 || comparer == null) return;
+            if (array == null || array.Length <= 1 || comparer == null) return array;
             Array.Sort(array, comparer);
+            return array;
         }
         
-        public static void Sort<T>(this T[] array, Comparison<T> comparison)
+        public static T[] Sort<T>(this T[] array, Comparison<T> comparison)
         {
-            if (array == null || array.Length <= 1 || comparison == null) return;
+            if (array == null || array.Length <= 1 || comparison == null) return array;
             Array.Sort(array, comparison);
+            return array;
         }
         
-        public static void Sort<T>(this IList<T> list, Comparison<T> comparison)
+        public static IList<T> Sort<T>(this IList<T> list, Comparison<T> comparison)
         {
-            if (list == null || list.Count <= 1 || comparison == null) return;
+            if (list == null || list.Count <= 1 || comparison == null) return list;
             list.Sort(0, list.Count - 1, comparison);
+            return list;
         }
 
-        public static void Sort<T>(this IList<T> list, int startIndex, int endIndex, Comparison<T> comparison)
+        public static IList<T> Sort<T>(this IList<T> list, int startIndex, int endIndex, Comparison<T> comparison)
         {
-            if (list == null || comparison == null || startIndex < 0 || endIndex >= list.Count || startIndex >= endIndex) return;
+            if (list == null || list.Count <= 1 || comparison == null || startIndex < 0 || endIndex >= list.Count || startIndex >= endIndex) return list;
             list.SortInternal(startIndex, endIndex, comparison);
+            return list;
         }
         
         private static void SortInternal<T>(this IList<T> list, int startIndex, int endIndex, Comparison<T> comparison)
