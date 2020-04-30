@@ -61,6 +61,11 @@ namespace GameUtil.Extensions
             return vector2.x < vector2.y ? UnityEngine.Random.Range(vector2.x, vector2.y) : UnityEngine.Random.Range(vector2.y, vector2.x);
         }
         
+        public static float Random(this Vector2Int vector2)
+        {
+            return vector2.x < vector2.y ? UnityEngine.Random.Range(vector2.x, vector2.y) : UnityEngine.Random.Range(vector2.y, vector2.x);
+        }
+        
         public static string GetTransformPath(this Transform transform)
         {
             StringBuilder sb = new StringBuilder(transform.name);
