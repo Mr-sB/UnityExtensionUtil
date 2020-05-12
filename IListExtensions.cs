@@ -29,47 +29,106 @@ namespace GameUtil.Extensions
         public static IList<T> Sort<T>(this IList<T> list, int startIndex, int endIndex, Comparison<T> comparison)
         {
             if (list == null || list.Count <= 1 || comparison == null || startIndex < 0 || endIndex >= list.Count || startIndex >= endIndex) return list;
-            list.SortInternal(startIndex, endIndex, comparison);
+            list.QuickSort(startIndex, endIndex, comparison);
             return list;
         }
-
-        private static void SortInternal<T>(this IList<T> list, int startIndex, int endIndex, Comparison<T> comparison)
+        
+        //.NET QuickSort source code
+        private static void QuickSort<T>(this IList<T> keys, int left, int right, Comparison<T> comparer)
         {
-            //无需错误检查，因为在调用SortInternal之前已经经过检查了，避免递归时重复检查消耗性能
-            while (true)
+            do
             {
-                //结束条件
-                if (startIndex >= endIndex) return;
-                int leftIndex = startIndex;
-                int rightIndex = endIndex;
-                //取最左边的为基准数
-                T tmp = list[startIndex];
-                while (leftIndex < rightIndex)
+                int i = left;
+                int j = right;
+ 
+                // pre-sort the low, middle (pivot), and high values in place.
+                // this improves performance in the face of already sorted data, or 
+                // data that is made up of multiple sorted runs appended together.
+                int middle = i + ((j - i) >> 1);
+                SwapIfGreater(keys, comparer, i, middle);  // swap the low with the mid point
+                SwapIfGreater(keys, comparer, i, j);   // swap the low with the high
+                SwapIfGreater(keys, comparer, middle, j); // swap the middle with the high
+ 
+                T x = keys[middle];
+                do
                 {
-                    //先从右开始遍历比较
-                    while (comparison(list[rightIndex], tmp) >= 0 && leftIndex < rightIndex) rightIndex--;
-                    //再从左开始遍历比较
-                    while (comparison(list[leftIndex], tmp) <= 0 && leftIndex < rightIndex) leftIndex++;
-                    //交换
-                    if (leftIndex < rightIndex)
+                    while (comparer(keys[i], x) < 0) i++;
+                    while (comparer(x, keys[j]) < 0) j--;
+                    // Contract.Assert(i >= left && j <= right, "(i>=left && j<=right)  Sort failed - Is your IComparer bogus?");
+                    if (i > j) break;
+                    if (i < j)
                     {
-                        var t = list[leftIndex];
-                        list[leftIndex] = list[rightIndex];
-                        list[rightIndex] = t;
+                        T key = keys[i];
+                        keys[i] = keys[j];
+                        keys[j] = key;
                     }
+                    i++;
+                    j--;
+                } while (i <= j);
+ 
+                // The next iteration of the while loop is to "recursively" sort the larger half of the array and the
+                // following calls recrusively sort the smaller half.  So we subtrack one from depthLimit here so
+                // both sorts see the new value.
+ 
+                if (j - left <= right - i)
+                {
+                    if (left < j) QuickSort(keys, left, j, comparer);
+                    left = i;
                 }
-
-                //基准数归位
-                list[startIndex] = list[leftIndex];
-                list[leftIndex] = tmp;
-                //递归左
-                list.SortInternal(startIndex, leftIndex - 1, comparison);
-                //递归右
-                // list.SortInternal(leftIndex + 1, endIndex, comparison);
-                // 手动将尾递归优化掉
-                startIndex = leftIndex + 1;
-            }
+                else
+                {
+                    if (i < right) QuickSort(keys, i, right, comparer);
+                    right = j;
+                }
+            } while (left < right);
         }
+         
+         private static void SwapIfGreater<T>(IList<T> keys, Comparison<T> comparer, int a, int b)
+         {
+             if (a == b) return;
+             if (comparer(keys[a], keys[b]) <= 0) return;
+             T key = keys[a];
+             keys[a] = keys[b];
+             keys[b] = key;
+         }
+
+        // private static void SortInternal<T>(this IList<T> list, int startIndex, int endIndex, Comparison<T> comparison)
+        // {
+        //     //无需错误检查，因为在调用SortInternal之前已经经过检查了，避免递归时重复检查消耗性能
+        //     while (true)
+        //     {
+        //         //结束条件
+        //         if (startIndex >= endIndex) return;
+        //         int leftIndex = startIndex;
+        //         int rightIndex = endIndex;
+        //         //取最左边的为基准数
+        //         T tmp = list[startIndex];
+        //         while (leftIndex < rightIndex)
+        //         {
+        //             //先从右开始遍历比较
+        //             while (comparison(list[rightIndex], tmp) >= 0 && leftIndex < rightIndex) rightIndex--;
+        //             //再从左开始遍历比较
+        //             while (comparison(list[leftIndex], tmp) <= 0 && leftIndex < rightIndex) leftIndex++;
+        //             //交换
+        //             if (leftIndex < rightIndex)
+        //             {
+        //                 var t = list[leftIndex];
+        //                 list[leftIndex] = list[rightIndex];
+        //                 list[rightIndex] = t;
+        //             }
+        //         }
+        //
+        //         //基准数归位
+        //         list[startIndex] = list[leftIndex];
+        //         list[leftIndex] = tmp;
+        //         //递归左
+        //         list.SortInternal(startIndex, leftIndex - 1, comparison);
+        //         //递归右
+        //         // list.SortInternal(leftIndex + 1, endIndex, comparison);
+        //         // 手动将尾递归优化掉
+        //         startIndex = leftIndex + 1;
+        //     }
+        // }
         #endregion
 
         #region Find
