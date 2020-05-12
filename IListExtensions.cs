@@ -6,6 +6,8 @@ namespace GameUtil.Extensions
     public static class IListExtensions
     {
         #region Sort
+        private const int QuickSortDepthThreshold = 32;//快排的深度限制
+        
         public static T[] Sort<T>(this T[] array, IComparer<T> comparer)
         {
             if (array == null || array.Length <= 1 || comparer == null) return array;
@@ -30,15 +32,23 @@ namespace GameUtil.Extensions
         {
             int endIndex = startIndex + length - 1;
             if (list == null || list.Count <= 1 || comparison == null || startIndex < 0 || endIndex >= list.Count || startIndex >= endIndex) return list;
-            list.QuickSort(startIndex, endIndex, comparison);
+            list.DepthLimitedQuickSort(startIndex, endIndex, comparison, QuickSortDepthThreshold);
             return list;
         }
         
-        //.NET QuickSort source code
-        private static void QuickSort<T>(this IList<T> keys, int left, int right, Comparison<T> comparer)
+        //.NET DepthLimitedQuickSort source code
+        //深度限制快排
+        private static void DepthLimitedQuickSort<T>(this IList<T> keys, int left, int right, Comparison<T> comparer, int depthLimit)
         {
             do
             {
+                //超过深度限制就使用堆排序
+                if (depthLimit == 0)
+                {
+                    HeapSort(keys, left, right, comparer);
+                    return;
+                }
+                
                 int i = left;
                 int j = right;
  
@@ -70,15 +80,16 @@ namespace GameUtil.Extensions
                 // The next iteration of the while loop is to "recursively" sort the larger half of the array and the
                 // following calls recrusively sort the smaller half.  So we subtrack one from depthLimit here so
                 // both sorts see the new value.
+                depthLimit--;
  
                 if (j - left <= right - i)
                 {
-                    if (left < j) QuickSort(keys, left, j, comparer);
+                    if (left < j) DepthLimitedQuickSort(keys, left, j, comparer, depthLimit);
                     left = i;
                 }
                 else
                 {
-                    if (i < right) QuickSort(keys, i, right, comparer);
+                    if (i < right) DepthLimitedQuickSort(keys, i, right, comparer, depthLimit);
                     right = j;
                 }
             } while (left < right);
@@ -91,6 +102,47 @@ namespace GameUtil.Extensions
              T key = keys[a];
              keys[a] = keys[b];
              keys[b] = key;
+         }
+         
+         private static void HeapSort<T>(this IList<T> keys, int lo, int hi, Comparison<T> comparer)
+         {
+             int n = hi - lo + 1;
+             for (int i = n / 2; i >= 1; i = i - 1)
+             {
+                 DownHeap(keys, i, n, lo, comparer);
+             }
+             for (int i = n; i > 1; i = i - 1)
+             {
+                 Swap(keys, lo, lo + i - 1);
+                 DownHeap(keys, 1, i - 1, lo, comparer);
+             }
+         }
+
+         private static void DownHeap<T>(this IList<T> keys, int i, int n, int lo, Comparison<T> comparer)
+         {
+             T d = keys[lo + i - 1];
+             int child;
+             while (i <= n / 2)
+             {
+                 child = 2 * i;
+                 if (child < n && comparer(keys[lo + child - 1], keys[lo + child]) < 0)
+                 {
+                     child++;
+                 }
+                 if (!(comparer(d, keys[lo + child - 1]) < 0))
+                     break;
+                 keys[lo + i - 1] = keys[lo + child - 1];
+                 i = child;
+             }
+             keys[lo + i - 1] = d;
+         }
+         
+         private static void Swap<T>(IList<T> a, int i, int j)
+         {
+             if (i == j) return;
+             T t = a[i];
+             a[i] = a[j];
+             a[j] = t;
          }
 
         // private static void SortInternal<T>(this IList<T> list, int startIndex, int endIndex, Comparison<T> comparison)
