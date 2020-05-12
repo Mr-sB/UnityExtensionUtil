@@ -23,11 +23,12 @@ namespace GameUtil.Extensions
         public static IList<T> Sort<T>(this IList<T> list, Comparison<T> comparison)
         {
             if (list == null || list.Count <= 1 || comparison == null) return list;
-            return list.Sort(0, list.Count - 1, comparison);
+            return list.Sort(0, list.Count, comparison);
         }
 
-        public static IList<T> Sort<T>(this IList<T> list, int startIndex, int endIndex, Comparison<T> comparison)
+        public static IList<T> Sort<T>(this IList<T> list, int startIndex, int length, Comparison<T> comparison)
         {
+            int endIndex = startIndex + length - 1;
             if (list == null || list.Count <= 1 || comparison == null || startIndex < 0 || endIndex >= list.Count || startIndex >= endIndex) return list;
             list.QuickSort(startIndex, endIndex, comparison);
             return list;
