@@ -4,7 +4,7 @@ namespace GameUtil.Extensions
     {
         private static string GetText(this string key)
         {
-            return key.Replace("\\n","\n").Replace("，", ",");
+            return key.Replace("\\n","\n").Replace('，', ',');
         }
         
         public static string GetText(this string key, object arg0)
