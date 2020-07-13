@@ -1,6 +1,7 @@
 using System.Text;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace GameUtil.Extensions
 {
@@ -77,5 +78,38 @@ namespace GameUtil.Extensions
             }
             return sb.ToString();
         }
+
+        #region Keyframe
+        public static string KeyframeToJson(this UnityEngine.Keyframe keyframe, bool prettyPrint = false)
+        {
+            return JsonUtility.ToJson(new Keyframe(keyframe), prettyPrint);
+        }
+        
+        public static string KeyframeArrayToJson(this UnityEngine.Keyframe[] keyframes, bool prettyPrint = false)
+        {
+            if (keyframes == null) return string.Empty;
+            int length = keyframes.Length;
+            Keyframe[] exKeyframes = new Keyframe[length];
+            for (int i = 0; i < length; i++)
+                exKeyframes[i] = keyframes[i];
+            return JsonUtilityExtensions.ToJson(exKeyframes, prettyPrint);
+        }
+
+        public static UnityEngine.Keyframe KeyframeFromJson(string json)
+        {
+            return JsonUtilityExtensions.FromJson<Keyframe>(json);
+        }
+        
+        public static UnityEngine.Keyframe[] KeyframeArrayFromJson(string json)
+        {
+            Keyframe[] exKeyframes = JsonUtilityExtensions.FromJson<Keyframe[]>(json);
+            if (exKeyframes == null) return null;
+            int length = exKeyframes.Length;
+            UnityEngine.Keyframe[] keyframes = new UnityEngine.Keyframe[length];
+            for (int i = 0; i < length; i++)
+                keyframes[i] = exKeyframes[i];
+            return keyframes;
+        }
+        #endregion
     }
 }
