@@ -1,6 +1,7 @@
+using GameUtil.Extensions;
 using UnityEngine;
 
-namespace GameUtil.Extensions
+namespace GameUtil.AnimationCurveExtensions
 {
     public class AnimationCurve
     {

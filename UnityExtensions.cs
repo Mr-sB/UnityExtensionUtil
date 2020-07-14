@@ -80,41 +80,41 @@ namespace GameUtil.Extensions
         }
 
         #region AnimationCurve
-        public static string AnimationCurveToJson(this UnityEngine.AnimationCurve curve, bool prettyPrint = false)
+        public static string AnimationCurveToJson(this AnimationCurve curve, bool prettyPrint = false)
         {
-            return JsonUtility.ToJson(new AnimationCurve(curve), prettyPrint);
+            return JsonUtility.ToJson(new AnimationCurveExtensions.AnimationCurve(curve), prettyPrint);
         }
         
-        public static string AnimationCurveArrayToJson(this UnityEngine.AnimationCurve[] curves, bool prettyPrint = false)
+        public static string AnimationCurveArrayToJson(this AnimationCurve[] curves, bool prettyPrint = false)
         {
             return JsonUtilityExtensions.ToJson(curves.AnimationCurveArray2ExAnimationCurveArray(), prettyPrint);
         }
 
-        public static UnityEngine.AnimationCurve AnimationCurveFromJson(string json)
+        public static AnimationCurve AnimationCurveFromJson(string json)
         {
-            return JsonUtilityExtensions.FromJson<AnimationCurve>(json);
+            return JsonUtilityExtensions.FromJson<AnimationCurveExtensions.AnimationCurve>(json);
         }
         
-        public static UnityEngine.AnimationCurve[] AnimationCurveArrayFromJson(string json)
+        public static AnimationCurve[] AnimationCurveArrayFromJson(string json)
         {
-            return JsonUtilityExtensions.FromJson<AnimationCurve[]>(json).ExAnimationCurveArray2AnimationCurveArray();
+            return JsonUtilityExtensions.FromJson<AnimationCurveExtensions.AnimationCurve[]>(json).ExAnimationCurveArray2AnimationCurveArray();
         }
         
-        public static UnityEngine.AnimationCurve[] ExAnimationCurveArray2AnimationCurveArray(this AnimationCurve[] exCurves)
+        public static AnimationCurve[] ExAnimationCurveArray2AnimationCurveArray(this AnimationCurveExtensions.AnimationCurve[] exCurves)
         {
             if (exCurves == null) return null;
             int length = exCurves.Length;
-            UnityEngine.AnimationCurve[] curves = new UnityEngine.AnimationCurve[length];
+            AnimationCurve[] curves = new AnimationCurve[length];
             for (int i = 0; i < length; i++)
                 curves[i] = exCurves[i];
             return curves;
         }
 
-        public static AnimationCurve[] AnimationCurveArray2ExAnimationCurveArray(this UnityEngine.AnimationCurve[] curves)
+        public static AnimationCurveExtensions.AnimationCurve[] AnimationCurveArray2ExAnimationCurveArray(this AnimationCurve[] curves)
         {
             if (curves == null) return null;
             int length = curves.Length;
-            AnimationCurve[] exCurves = new AnimationCurve[length];
+            AnimationCurveExtensions.AnimationCurve[] exCurves = new AnimationCurveExtensions.AnimationCurve[length];
             for (int i = 0; i < length; i++)
                 exCurves[i] = curves[i];
             return exCurves;
@@ -122,41 +122,41 @@ namespace GameUtil.Extensions
         #endregion
 
         #region Keyframe
-        public static string KeyframeToJson(this UnityEngine.Keyframe keyframe, bool prettyPrint = false)
+        public static string KeyframeToJson(this Keyframe keyframe, bool prettyPrint = false)
         {
-            return JsonUtility.ToJson(new Keyframe(keyframe), prettyPrint);
+            return JsonUtility.ToJson(new AnimationCurveExtensions.Keyframe(keyframe), prettyPrint);
         }
         
-        public static string KeyframeArrayToJson(this UnityEngine.Keyframe[] keyframes, bool prettyPrint = false)
+        public static string KeyframeArrayToJson(this Keyframe[] keyframes, bool prettyPrint = false)
         {
             return JsonUtilityExtensions.ToJson(keyframes.KeyframeArray2ExKeyframeArray(), prettyPrint);
         }
 
-        public static UnityEngine.Keyframe KeyframeFromJson(string json)
+        public static Keyframe KeyframeFromJson(string json)
         {
-            return JsonUtilityExtensions.FromJson<Keyframe>(json);
+            return JsonUtilityExtensions.FromJson<AnimationCurveExtensions.Keyframe>(json);
         }
         
-        public static UnityEngine.Keyframe[] KeyframeArrayFromJson(string json)
+        public static Keyframe[] KeyframeArrayFromJson(string json)
         {
-            return JsonUtilityExtensions.FromJson<Keyframe[]>(json).ExKeyframeArray2KeyframeArray();
+            return JsonUtilityExtensions.FromJson<AnimationCurveExtensions.Keyframe[]>(json).ExKeyframeArray2KeyframeArray();
         }
 
-        public static UnityEngine.Keyframe[] ExKeyframeArray2KeyframeArray(this Keyframe[] exKeyframes)
+        public static Keyframe[] ExKeyframeArray2KeyframeArray(this AnimationCurveExtensions.Keyframe[] exKeyframes)
         {
             if (exKeyframes == null) return null;
             int length = exKeyframes.Length;
-            UnityEngine.Keyframe[] keyframes = new UnityEngine.Keyframe[length];
+            Keyframe[] keyframes = new Keyframe[length];
             for (int i = 0; i < length; i++)
                 keyframes[i] = exKeyframes[i];
             return keyframes;
         }
 
-        public static Keyframe[] KeyframeArray2ExKeyframeArray(this UnityEngine.Keyframe[] keyframes)
+        public static AnimationCurveExtensions.Keyframe[] KeyframeArray2ExKeyframeArray(this Keyframe[] keyframes)
         {
             if (keyframes == null) return null;
             int length = keyframes.Length;
-            Keyframe[] exKeyframes = new Keyframe[length];
+            AnimationCurveExtensions.Keyframe[] exKeyframes = new AnimationCurveExtensions.Keyframe[length];
             for (int i = 0; i < length; i++)
                 exKeyframes[i] = keyframes[i];
             return exKeyframes;

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace GameUtil.Extensions
+namespace GameUtil.AnimationCurveExtensions
 {
     /// <summary>
     ///   <para>A single keyframe that can be injected into an animation curve.</para>
