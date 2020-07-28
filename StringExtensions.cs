@@ -2,7 +2,7 @@ namespace GameUtil.Extensions
 {
     public static class StringExtensions
     {
-        private static string GetText(this string key)
+        public static string GetText(this string key)
         {
             return key.Replace("\\n","\n").Replace('，', ',');
         }
