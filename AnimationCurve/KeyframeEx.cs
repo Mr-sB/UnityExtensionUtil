@@ -7,7 +7,7 @@ namespace GameUtil.AnimationCurveExtensions
     ///   <para>A single keyframe that can be injected into an animation curve.</para>
     /// </summary>
     [Serializable]
-    public struct Keyframe
+    public struct KeyframeEx
     {
         [SerializeField] private float m_Time;
         [SerializeField] private float m_Value;
@@ -22,7 +22,7 @@ namespace GameUtil.AnimationCurveExtensions
         /// </summary>
         /// <param name="time"></param>
         /// <param name="value"></param>
-        public Keyframe(float time, float value)
+        public KeyframeEx(float time, float value)
         {
             this.m_Time = time;
             this.m_Value = value;
@@ -40,7 +40,7 @@ namespace GameUtil.AnimationCurveExtensions
         /// <param name="value"></param>
         /// <param name="inTangent"></param>
         /// <param name="outTangent"></param>
-        public Keyframe(float time, float value, float inTangent, float outTangent)
+        public KeyframeEx(float time, float value, float inTangent, float outTangent)
         {
             this.m_Time = time;
             this.m_Value = value;
@@ -60,7 +60,7 @@ namespace GameUtil.AnimationCurveExtensions
         /// <param name="outTangent"></param>
         /// <param name="inWeight"></param>
         /// <param name="outWeight"></param>
-        public Keyframe(
+        public KeyframeEx(
             float time,
             float value,
             float inTangent,
@@ -77,7 +77,7 @@ namespace GameUtil.AnimationCurveExtensions
             this.m_OutWeight = outWeight;
         }
 
-        public Keyframe(Keyframe keyframe)
+        public KeyframeEx(KeyframeEx keyframe)
         {
             this.m_Time = keyframe.time;
             this.m_Value = keyframe.value;
@@ -88,7 +88,7 @@ namespace GameUtil.AnimationCurveExtensions
             this.m_OutWeight = keyframe.outWeight;
         }
         
-        public Keyframe(UnityEngine.Keyframe keyframe)
+        public KeyframeEx(UnityEngine.Keyframe keyframe)
         {
             this.m_Time = keyframe.time;
             this.m_Value = keyframe.value;
@@ -162,14 +162,14 @@ namespace GameUtil.AnimationCurveExtensions
             set { this.m_WeightedMode = (int) value; }
         }
 
-        public static implicit operator Keyframe(UnityEngine.Keyframe keyframe)
+        public static implicit operator KeyframeEx(Keyframe keyframe)
         {
-            return new Keyframe(keyframe);
+            return new KeyframeEx(keyframe);
         }
         
-        public static implicit operator UnityEngine.Keyframe(Keyframe keyframe)
+        public static implicit operator Keyframe(KeyframeEx keyframe)
         {
-            return new UnityEngine.Keyframe(keyframe.time, keyframe.value, keyframe.inTangent, keyframe.outTangent,
+            return new Keyframe(keyframe.time, keyframe.value, keyframe.inTangent, keyframe.outTangent,
                 keyframe.inWeight, keyframe.outWeight)
             {
                 weightedMode = keyframe.weightedMode

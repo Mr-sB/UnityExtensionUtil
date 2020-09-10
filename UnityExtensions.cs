@@ -1,4 +1,5 @@
 using System.Text;
+using GameUtil.AnimationCurveExtensions;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -82,7 +83,7 @@ namespace GameUtil.Extensions
         #region AnimationCurve
         public static string AnimationCurveToJson(this AnimationCurve curve, bool prettyPrint = false)
         {
-            return JsonUtility.ToJson(new AnimationCurveExtensions.AnimationCurve(curve), prettyPrint);
+            return JsonUtility.ToJson(new AnimationCurveEx(curve), prettyPrint);
         }
         
         public static string AnimationCurveArrayToJson(this AnimationCurve[] curves, bool prettyPrint = false)
@@ -92,15 +93,15 @@ namespace GameUtil.Extensions
 
         public static AnimationCurve AnimationCurveFromJson(string json)
         {
-            return JsonUtilityExtensions.FromJson<AnimationCurveExtensions.AnimationCurve>(json);
+            return JsonUtilityExtensions.FromJson<AnimationCurveEx>(json);
         }
         
         public static AnimationCurve[] AnimationCurveArrayFromJson(string json)
         {
-            return JsonUtilityExtensions.FromJson<AnimationCurveExtensions.AnimationCurve[]>(json).ExAnimationCurveArray2AnimationCurveArray();
+            return JsonUtilityExtensions.FromJson<AnimationCurveEx[]>(json).ExAnimationCurveArray2AnimationCurveArray();
         }
         
-        public static AnimationCurve[] ExAnimationCurveArray2AnimationCurveArray(this AnimationCurveExtensions.AnimationCurve[] exCurves)
+        public static AnimationCurve[] ExAnimationCurveArray2AnimationCurveArray(this AnimationCurveEx[] exCurves)
         {
             if (exCurves == null) return null;
             int length = exCurves.Length;
@@ -110,11 +111,11 @@ namespace GameUtil.Extensions
             return curves;
         }
 
-        public static AnimationCurveExtensions.AnimationCurve[] AnimationCurveArray2ExAnimationCurveArray(this AnimationCurve[] curves)
+        public static AnimationCurveEx[] AnimationCurveArray2ExAnimationCurveArray(this AnimationCurve[] curves)
         {
             if (curves == null) return null;
             int length = curves.Length;
-            AnimationCurveExtensions.AnimationCurve[] exCurves = new AnimationCurveExtensions.AnimationCurve[length];
+            AnimationCurveEx[] exCurves = new AnimationCurveEx[length];
             for (int i = 0; i < length; i++)
                 exCurves[i] = curves[i];
             return exCurves;
@@ -124,7 +125,7 @@ namespace GameUtil.Extensions
         #region Keyframe
         public static string KeyframeToJson(this Keyframe keyframe, bool prettyPrint = false)
         {
-            return JsonUtility.ToJson(new AnimationCurveExtensions.Keyframe(keyframe), prettyPrint);
+            return JsonUtility.ToJson(new KeyframeEx(keyframe), prettyPrint);
         }
         
         public static string KeyframeArrayToJson(this Keyframe[] keyframes, bool prettyPrint = false)
@@ -134,15 +135,15 @@ namespace GameUtil.Extensions
 
         public static Keyframe KeyframeFromJson(string json)
         {
-            return JsonUtilityExtensions.FromJson<AnimationCurveExtensions.Keyframe>(json);
+            return JsonUtilityExtensions.FromJson<KeyframeEx>(json);
         }
         
         public static Keyframe[] KeyframeArrayFromJson(string json)
         {
-            return JsonUtilityExtensions.FromJson<AnimationCurveExtensions.Keyframe[]>(json).ExKeyframeArray2KeyframeArray();
+            return JsonUtilityExtensions.FromJson<KeyframeEx[]>(json).ExKeyframeArray2KeyframeArray();
         }
 
-        public static Keyframe[] ExKeyframeArray2KeyframeArray(this AnimationCurveExtensions.Keyframe[] exKeyframes)
+        public static Keyframe[] ExKeyframeArray2KeyframeArray(this KeyframeEx[] exKeyframes)
         {
             if (exKeyframes == null) return null;
             int length = exKeyframes.Length;
@@ -152,11 +153,11 @@ namespace GameUtil.Extensions
             return keyframes;
         }
 
-        public static AnimationCurveExtensions.Keyframe[] KeyframeArray2ExKeyframeArray(this Keyframe[] keyframes)
+        public static KeyframeEx[] KeyframeArray2ExKeyframeArray(this Keyframe[] keyframes)
         {
             if (keyframes == null) return null;
             int length = keyframes.Length;
-            AnimationCurveExtensions.Keyframe[] exKeyframes = new AnimationCurveExtensions.Keyframe[length];
+            KeyframeEx[] exKeyframes = new KeyframeEx[length];
             for (int i = 0; i < length; i++)
                 exKeyframes[i] = keyframes[i];
             return exKeyframes;

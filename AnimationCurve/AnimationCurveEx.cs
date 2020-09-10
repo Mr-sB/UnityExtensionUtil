@@ -3,12 +3,12 @@ using UnityEngine;
 
 namespace GameUtil.AnimationCurveExtensions
 {
-    public class AnimationCurve
+    public class AnimationCurveEx
     {
         /// <summary>
         ///   <para>All keys defined in the animation curve.</para>
         /// </summary>
-        public Keyframe[] keys;
+        public KeyframeEx[] keys;
 
         /// <summary>
         ///   <para>The behaviour of the animation before the first keyframe.</para>
@@ -20,7 +20,7 @@ namespace GameUtil.AnimationCurveExtensions
         /// </summary>
         public WrapMode postWrapMode;
         
-        public AnimationCurve()
+        public AnimationCurveEx()
         {
             this.keys = null;
         }
@@ -29,29 +29,29 @@ namespace GameUtil.AnimationCurveExtensions
         ///   <para>Creates an animation curve from an arbitrary number of keyframes.</para>
         /// </summary>
         /// <param name="keys">An array of Keyframes used to define the curve.</param>
-        public AnimationCurve(params Keyframe[] keys)
+        public AnimationCurveEx(params KeyframeEx[] keys)
         {
             this.keys = keys;
         }
         
-        private AnimationCurve(params UnityEngine.Keyframe[] keys)
+        private AnimationCurveEx(params Keyframe[] keys)
         {
             this.keys = keys.KeyframeArray2ExKeyframeArray();
         }
         
-        public AnimationCurve(AnimationCurve curve) : this(curve.keys)
+        public AnimationCurveEx(AnimationCurveEx curve) : this(curve.keys)
         {
             preWrapMode = curve.preWrapMode;
             postWrapMode = curve.postWrapMode;
         }
 
-        public AnimationCurve(UnityEngine.AnimationCurve curve) : this(curve.keys)
+        public AnimationCurveEx(AnimationCurve curve) : this(curve.keys)
         {
             preWrapMode = curve.preWrapMode;
             postWrapMode = curve.postWrapMode;
         }
 
-        public Keyframe this[int index]
+        public KeyframeEx this[int index]
         {
             get { return keys[index]; }
         }
@@ -73,7 +73,7 @@ namespace GameUtil.AnimationCurveExtensions
         /// <returns>
         ///   <para>The constant curve created from the specified values.</para>
         /// </returns>
-        public static AnimationCurve Constant(
+        public static AnimationCurveEx Constant(
             float timeStart,
             float timeEnd,
             float value)
@@ -91,16 +91,16 @@ namespace GameUtil.AnimationCurveExtensions
         /// <returns>
         ///   <para>The linear curve created from the specified values.</para>
         /// </returns>
-        public static AnimationCurve Linear(
+        public static AnimationCurveEx Linear(
             float timeStart,
             float valueStart,
             float timeEnd,
             float valueEnd)
         {
             if (timeStart == timeEnd)
-                return new AnimationCurve(new Keyframe(timeStart, valueStart));
+                return new AnimationCurveEx(new KeyframeEx(timeStart, valueStart));
             float num = (valueEnd - valueStart) / (timeEnd - timeStart);
-            return new AnimationCurve(new Keyframe(timeStart, valueStart, 0.0f, num), new Keyframe(timeEnd, valueEnd, num, 0.0f));
+            return new AnimationCurveEx(new KeyframeEx(timeStart, valueStart, 0.0f, num), new KeyframeEx(timeEnd, valueEnd, num, 0.0f));
         }
 
         /// <summary>
@@ -113,25 +113,25 @@ namespace GameUtil.AnimationCurveExtensions
         /// <returns>
         ///   <para>The ease-in and out curve generated from the specified values.</para>
         /// </returns>
-        public static AnimationCurve EaseInOut(
+        public static AnimationCurveEx EaseInOut(
             float timeStart,
             float valueStart,
             float timeEnd,
             float valueEnd)
         {
             return (double) timeStart == (double) timeEnd
-                ? new AnimationCurve(new Keyframe(timeStart, valueStart))
-                : new AnimationCurve(new Keyframe(timeStart, valueStart, 0.0f, 0.0f), new Keyframe(timeEnd, valueEnd, 0.0f, 0.0f));
+                ? new AnimationCurveEx(new KeyframeEx(timeStart, valueStart))
+                : new AnimationCurveEx(new KeyframeEx(timeStart, valueStart, 0.0f, 0.0f), new KeyframeEx(timeEnd, valueEnd, 0.0f, 0.0f));
         }
 
-        public static implicit operator AnimationCurve(UnityEngine.AnimationCurve curve)
+        public static implicit operator AnimationCurveEx(AnimationCurve curve)
         {
-            return new AnimationCurve(curve);
+            return new AnimationCurveEx(curve);
         }
         
-        public static implicit operator UnityEngine.AnimationCurve(AnimationCurve curve)
+        public static implicit operator AnimationCurve(AnimationCurveEx curve)
         {
-            return new UnityEngine.AnimationCurve(curve.keys.ExKeyframeArray2KeyframeArray())
+            return new AnimationCurve(curve.keys.ExKeyframeArray2KeyframeArray())
             {
                 preWrapMode = curve.preWrapMode,
                 postWrapMode = curve.postWrapMode
