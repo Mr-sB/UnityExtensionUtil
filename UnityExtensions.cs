@@ -1,8 +1,10 @@
 using System.Text;
 using GameUtil.AnimationCurveExtensions;
-using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace GameUtil.Extensions
 {
