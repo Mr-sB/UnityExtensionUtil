@@ -231,8 +231,7 @@ namespace System.Collections.Generic.PriorityQueue
             while (parentIndex >= 0)
             {
                 DownFilter(parentIndex);
-                int leftIndex = GetChildIndex(parentIndex, true);
-                parentIndex = GetParentIndex(leftIndex - 1);
+                parentIndex--;
             }
         }
 
