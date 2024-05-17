@@ -85,6 +85,7 @@ namespace System.Collections.Generic.PriorityQueue
         {
             //自下而上的下滤
             //弗洛伊德建堆
+            //时间复杂度O(n)
             int count = Count;
             int parentIndex = GetParentIndex(count - 1);
             while (parentIndex >= 0)
