@@ -4,23 +4,57 @@ using UnityEngine;
 
 namespace AStar
 {
-    public class AStarFinder
+    public class AStarFinder<TNode> where TNode : AStarNode, new()
     {
         public int MapWidth { private set; get; }
         public int MapHeight { private set; get; }
         public HashSet<int> Obstacles { private set; get; }
         
         //开列表
-        private PriorityQueue<AStarNode> openList = new PriorityQueue<AStarNode>(16, false);
-        private Dictionary<int, AStarNode> openDict = new Dictionary<int, AStarNode>(16);
+        private PriorityQueue<AStarNode> openQueue;
+        private Dictionary<int, AStarNode> openDict;
         //闭列表
-        private HashSet<int> closeList = new HashSet<int>();
+        private Dictionary<int, AStarNode> closeDict;
 
+        //ObjectPool
+        private Queue<AStarNode> nodePool;
+
+        private TNode GetNodeFromPool()
+        {
+            return nodePool.Count > 0 ? (TNode)nodePool.Dequeue() : new TNode();
+        }
+
+        private TNode GetNodeFromPool(AStarNode parent, Vector2Int coordinate, int g, int h)
+        {
+            var node = GetNodeFromPool();
+            node.Set(parent, coordinate, g, h);
+            return node;
+        }
+        
+        private TNode GetNodeFromPool(AStarNode parent, Vector2Int coordinate, int g, Vector2Int to)
+        {
+            var node = GetNodeFromPool();
+            node.Set(parent, coordinate, g, to);
+            return node;
+        }
+
+        private void ReleaseNodeToPool(AStarNode node)
+        {
+            if (node == null) return;
+            node.Reset();
+            nodePool.Enqueue(node);
+        }
+        
         public AStarFinder()
         {
             MapWidth = 0;
             MapHeight = 0;
             Obstacles = new HashSet<int>();
+            
+            openQueue = new PriorityQueue<AStarNode>(16, false);
+            openDict = new Dictionary<int, AStarNode>(16);
+            closeDict = new Dictionary<int, AStarNode>(16);
+            nodePool = new Queue<AStarNode>(16);
         }
         
         public AStarFinder(int mapWidth, int mapHeight, IEnumerable<int> obstacles) : this()
@@ -69,52 +103,58 @@ namespace AStar
 
         public List<Vector2Int> FindPath(Vector2Int from, Vector2Int to, List<Vector2Int> path)
         {
-            openList.Clear();
+            openQueue.Clear();
             openDict.Clear();
-            closeList.Clear();
+            closeDict.Clear();
             path?.Clear();
             if (!IsPassable(from) || !IsPassable(to)) return path;
 
-            OpenEnqueue(new AStarNode(null , from, 0, to));
+            OpenEnqueue(GetNodeFromPool(null , from, 0, to));
 
             bool find = false;
             AStarNode curNode = null;
-            while (openList.Count > 0)
+            while (openQueue.Count > 0)
             {
                 curNode = OpenDequeue();
-                if (curNode.Coordinate == to)
+                if (curNode.ReachTarget(to))
                 {
                     //到达终点
                     find = true;
                     break;
                 }
 
-                closeList.Add(GetIndex(curNode.Coordinate));
+                closeDict.Add(GetIndex(curNode.Coordinate), curNode);
                 bool updateNode = AddNodeNeighbor(curNode, curNode.Up, to);
                 updateNode |= AddNodeNeighbor(curNode, curNode.Down, to);
                 updateNode |= AddNodeNeighbor(curNode, curNode.Left, to);
                 updateNode |= AddNodeNeighbor(curNode, curNode.Right, to);
                 //更新了原本就在开列表里的节点，刷新最小堆
                 if (updateNode)
-                    openList.Refresh();
+                    openQueue.Refresh();
             }
             
             //搜索结束
-            if (!find) return path;
-            
-            path ??= new List<Vector2Int>();
-            //倒序
-            while (curNode != null)
+            if (find)
             {
-                path.Add(curNode.Coordinate);
-                curNode = curNode.Parent;
+                path ??= new List<Vector2Int>();
+                //倒序
+                while (curNode != null)
+                {
+                    path.Add(curNode.Coordinate);
+                    curNode = curNode.Parent;
+                }
+                //反序
+                path.Reverse();
             }
-            //反序
-            path.Reverse();
+
+            foreach (var node in openDict.Values)
+                ReleaseNodeToPool(node);
+            foreach (var node in closeDict.Values)
+                ReleaseNodeToPool(node);
             
-            openList.Clear();
+            openQueue.Clear();
             openDict.Clear();
-            closeList.Clear();
+            closeDict.Clear();
             return path;
         }
         
@@ -123,19 +163,18 @@ namespace AStar
             int index = GetIndex(coordinate);
             //在闭列表 或者 不可通行
             //这里必须使用coordinate去判断是否能通行。否则不知道有没有超出宽度界限
-            if (closeList.Contains(index) || !IsPassable(coordinate)) return false;
+            if (closeDict.ContainsKey(index) || !IsPassable(coordinate)) return false;
                 
             bool updateNode = false;
             if (!openDict.TryGetValue(index, out var nextNode))
             {
                 //不在开列表，直接添加
-                OpenEnqueue(new AStarNode(node, coordinate, node.G + 1, to));
+                OpenEnqueue(GetNodeFromPool(node, coordinate, node.G + 1, to));
             }
             else if (node.G + 1 < nextNode.G)
             {
                 //更小的G值，更新
-                nextNode.G = node.G + 1;
-                nextNode.Parent = node;
+                nextNode.UpdateNode(node, node.G + 1);
                 updateNode = true;
             }
             return updateNode;
@@ -143,15 +182,20 @@ namespace AStar
 
         private void OpenEnqueue(AStarNode node)
         {
-            openList.Enqueue(node);
+            openQueue.Enqueue(node);
             openDict.Add(GetIndex(node.Coordinate), node);
         }
 
         private AStarNode OpenDequeue()
         {
-            var node = openList.Dequeue();
+            var node = openQueue.Dequeue();
             openDict.Remove(GetIndex(node.Coordinate));
             return node;
         }
+    }
+
+    public class AStarFinder : AStarFinder<AStarNode>
+    {
+        
     }
 }
