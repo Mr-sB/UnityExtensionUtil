@@ -22,13 +22,13 @@ namespace System.Collections.Generic.PriorityQueue
             return (childIndex - 1) >> 1;
         }
         
-        protected abstract bool Compare(T a, T b);
+        protected abstract int Compare(T a, T b);
 
         public void Enqueue(T element)
         {
             //插到最后，然后上滤
             nodes.Add(element);
-            UpFilter(GetParentIndex(Count - 1));
+            UpFilter(Count - 1);
         }
 
         public T Dequeue()
@@ -45,18 +45,28 @@ namespace System.Collections.Generic.PriorityQueue
             return element;
         }
 
-        protected void UpFilter(int parentIndex)
+        /// <summary>
+        /// 插入节点优先级高于父节点时上滤。使用挖洞式移动父节点，最后一次性放回插入节点。
+        /// </summary>
+        protected void UpFilter(int childIndex)
         {
-            while (parentIndex >= 0)
+            var child = nodes[childIndex];
+            while (childIndex > 0)
             {
-                int leftIndex = GetChildIndex(parentIndex, true);
-                int rightIndex = leftIndex + 1;
-                int nextIndex = CompareExchange(parentIndex, leftIndex, rightIndex);
-                if (nextIndex < 0) break;
+                int parentIndex = GetParentIndex(childIndex);
+                var parent = nodes[parentIndex];
+                // 相等优先级不交换，避免同级节点无意义上浮。
+                if (!IsHigherPriority(child, parent)) break;
                 
-                //继续上滤
-                parentIndex = GetParentIndex(parentIndex);
+                nodes[childIndex] = parent;
+                childIndex = parentIndex;
             }
+            nodes[childIndex] = child;
+        }
+
+        protected bool IsHigherPriority(T a, T b)
+        {
+            return Compare(a, b) < 0;
         }
 
         protected void DownFilter(int parentIndex)
@@ -113,7 +123,7 @@ namespace System.Collections.Generic.PriorityQueue
             {
                 //有右子节点
                 var right = nodes[rightIndex];
-                if (Compare(parent, left) && Compare(parent, right))
+                if (!IsHigherPriority(left, parent) && !IsHigherPriority(right, parent))
                 {
                     //parent最小
                     //已经完整了，不需要下滤了
@@ -121,7 +131,7 @@ namespace System.Collections.Generic.PriorityQueue
                 }
                     
                 //把小的交换到父节点
-                if (Compare(left, right))
+                if (IsHigherPriority(left, right))
                 {
                     //left最小
                     nodes[parentIndex] = left;
@@ -141,7 +151,7 @@ namespace System.Collections.Generic.PriorityQueue
             else
             {
                 //没有右子节点
-                if (Compare(parent, left))
+                if (!IsHigherPriority(left, parent))
                 {
                     //parent最小
                     //已经完整了，不需要下滤了
@@ -167,9 +177,9 @@ namespace System.Collections.Generic.PriorityQueue
             this.comparer = comparer ?? Comparer<TPriority>.Default;
         }
         
-        protected override bool Compare((TElement Element, TPriority Priority) a, (TElement Element, TPriority Priority) b)
+        protected override int Compare((TElement Element, TPriority Priority) a, (TElement Element, TPriority Priority) b)
         {
-            return comparer.Compare(a.Priority, b.Priority) <= 0;
+            return comparer.Compare(a.Priority, b.Priority);
         }
     }
 
@@ -182,10 +192,9 @@ namespace System.Collections.Generic.PriorityQueue
             this.bigHeap = bigHeap;
         }
 
-        protected override bool Compare(T a, T b)
+        protected override int Compare(T a, T b)
         {
-            int value = a.CompareTo(b);
-            return bigHeap ? value >= 0 : value <= 0;
+            return bigHeap ? b.CompareTo(a) : a.CompareTo(b);
         }
     }
 }
